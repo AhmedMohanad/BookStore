@@ -1,4 +1,6 @@
-﻿namespace BookStore.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace BookStore.Models
 {
     public class User
     {
@@ -7,6 +9,9 @@
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+        public int CartId { get; set; }
+        [ForeignKey("CartId")]
+        public Cart Cart { get; set; }
 
 
 
