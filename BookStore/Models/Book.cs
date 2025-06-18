@@ -12,7 +12,7 @@
         public bool IsAvailable { get; set; }
         public int Stock { get; set; }
 
-        public string ImageUrl { get; set; } = string.Empty;
+       
 
 
     }
