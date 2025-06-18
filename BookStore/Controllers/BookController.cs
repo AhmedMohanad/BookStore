@@ -14,8 +14,11 @@ namespace BookStore.Controllers
         }
         public IActionResult Index()
         {
-            return View();
+            var books = _context.Books.ToList();
+            return View(books);
         }
+
+
 
 
     }
