@@ -12,8 +12,7 @@ namespace BookStore.Models
         public List<int>? Books { get; set; }
 
         public int? UserId { get; set; }
-        [ForeignKey("UserId")]
-        public User? User { get; set; }
-
+    
+        
     }
 }

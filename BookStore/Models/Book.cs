@@ -8,7 +8,7 @@
         public string Description { get; set; } = string.Empty;
         public string Author { get; set; } = string.Empty;
         public string Genre { get; set; } = string.Empty;
-        public decimal Price { get; set; }
+        public double Price { get; set; }
         public bool IsAvailable { get; set; }
         public int Stock { get; set; }
 
