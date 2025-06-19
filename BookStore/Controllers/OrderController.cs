@@ -12,14 +12,13 @@ namespace BookStore.Controllers
     public class OrderController : ControllerBase
     {
         private readonly StoreDbContext _context;
-       
+
 
         public OrderController(StoreDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/orders
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -29,8 +28,9 @@ namespace BookStore.Controllers
             return Ok(orders);
         }
 
-        
+
         [HttpGet("{id}")]
+
         public async Task<IActionResult> GetById(int id)
         {
             var order = await _context.Orders
@@ -42,11 +42,11 @@ namespace BookStore.Controllers
             return Ok(order);
         }
 
-        // PUT: api/orders/{id}
+
         [HttpPut]
         public async Task<IActionResult> Edit(int id, [FromBody] Order order)
         {
-            if (id != order.Id )
+            if (id != order.Id)
                 return BadRequest("Order ID mismatch.");
             if (ModelState.IsValid)
             {
@@ -56,6 +56,39 @@ namespace BookStore.Controllers
             }
             return BadRequest("book not edited.");
 
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+
+            var order = await _context.Orders
+               .FindAsync(id);
+
+            if (order == null)
+                return NotFound("No order found.");
+             _context.Orders.Remove(order);
+            await _context.SaveChangesAsync();
+
+            return Ok("order deleted successfully.");
+
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> Create(Order order)
+        {
+            if(!ModelState.IsValid )
+            {
+
+                return BadRequest("invalid order.");
+
+            }
+
+            await _context.Orders.AddAsync(order);
+            await _context.SaveChangesAsync();  
+
+            return Ok(order);
         }
     }
 }
