@@ -83,6 +83,7 @@ namespace BookStore.Controllers
 
             var books = cart.Books.ToList();
             double total = _cs.CalculateTotale(books);
+
             int userId =(int) cart.UserId;
             DateTime time = DateTime.Now;
             Order order = new Order()
