@@ -41,9 +41,9 @@ namespace BookStore.Controllers
             var cart = await _context.Carts
                 .Include(c => c.Books)
                . FirstOrDefaultAsync(c => c.Id == cartId);
-            if (cart == null) return NotFound("this cart not exist");
+            if (cart == null) return BadRequest("this cart not exist");
             var item = await _context.Books.FirstOrDefaultAsync(i => i.Id==itemId);
-            if (item == null) return NotFound("this item not exist.");
+            if (item == null) return BadRequest("this item not exist.");
 
              cart.Books?.Add(itemId);
             await _context.SaveChangesAsync();
@@ -60,7 +60,7 @@ namespace BookStore.Controllers
             var cart = await _context.Carts.FindAsync(cartId);
             if (cart == null)
             {
-                return NotFound("no cart is empty.");
+                return NotFound(" cart is empty.");
             }
 
             if (cart.Books == null || !cart.Books.Contains(itemId))
