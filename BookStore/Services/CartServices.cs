@@ -6,15 +6,28 @@ namespace BookStore.Services
     public class CartServices
     {
         private BookServices _bs;
+        private StoreDbContext _db;
         public CartServices(StoreDbContext context)
         {
-            _bs = new BookServices(context);
+           _db = context;
         }
 
 
 
+        public int CreateCart()
+        {
+            _db.Carts.Add(new Cart());
+            _db.SaveChanges();
+            return _db.Carts.OrderBy(o=>o.Id).Last().Id;
+
+
+
+        }
+
         public double CalculateTotale(List<int> ids)
         {
+
+            _bs = new BookServices(_db);
             List<double> books = new List<double>();
 
             for (int i = 0; i < ids.Count; i++)

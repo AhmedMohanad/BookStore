@@ -1,6 +1,7 @@
 ﻿using BookStore.Data;
 using BookStore.Models;
 using BookStore.Validatore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,6 +31,7 @@ namespace BookStore.Controllers
         }
 
         // GET api/books/{id}
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBookById(int id)
         {
