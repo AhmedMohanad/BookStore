@@ -9,7 +9,7 @@ namespace BookStore.Models
        
       
 
-        public List<int>? Books { get; set; }
+        public List<int>? Books { get; set; } = new List<int>();
 
         public int? UserId { get; set; }
     

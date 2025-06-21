@@ -7,8 +7,8 @@ using Microsoft.EntityFrameworkCore;
 namespace BookStore.Controllers
 {
     [ApiController]
-    [Route("api/order")]  // Pluralized resource name
-    public class OrdersController : ControllerBase  // Pluralized controller name
+    [Route("api/order")] 
+    public class OrdersController : ControllerBase  
     {
         private readonly StoreDbContext _context;
         private readonly JWTServices _jwtServices;
@@ -30,7 +30,7 @@ namespace BookStore.Controllers
 
         }
 
-        // GET api/orders
+        // GET api/order
         [HttpGet]
         public async Task<IActionResult> GetAllOrders()
         {
@@ -41,7 +41,7 @@ namespace BookStore.Controllers
            
         }
 
-        // GET api/orders/{id}
+        // GET api/order/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetOrderById(int id)
         {
@@ -52,7 +52,7 @@ namespace BookStore.Controllers
            
         }
 
-        // POST api/orders
+        // POST api/order
         [HttpPost]
         public async Task<IActionResult> CreateOrder([FromBody] Order order)
         {
@@ -67,7 +67,7 @@ namespace BookStore.Controllers
            
         }
 
-        // PUT api/orders/{id}
+        // PUT api/order/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateOrder(int id, [FromBody] Order order)
         {
@@ -86,7 +86,7 @@ namespace BookStore.Controllers
 
         }
 
-        // DELETE api/orders/{id}
+        // DELETE api/order/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrder(int id)
         {

@@ -23,27 +23,25 @@ namespace BookStore.Services
             
         }
 
-        public Book GetBookByTitle(string title)
+        public List<Book> GetBooksByTitle(string title)
         {
-            var book = _context.Books.FirstOrDefault(x => x.Title == title);
-            return book;
-
-
+            return _context.Books
+                .Where(b => b.Title.ToLower() == title.ToLower())
+                .ToList();
         }
 
-        public Book GetBookByAuthor(string author)
+        public List<Book> GetBooksByAuthor(string author)
         {
-            var book = _context.Books.FirstOrDefault(x => x.Author == author);
-            return book;
-
-
+            return _context.Books
+                .Where(b => b.Author.ToLower() == author.ToLower())
+                .ToList();
         }
-        public Book GetBookByGenre(string genre)
+
+        public List<Book> GetBooksByGenre(string genre)
         {
-            var book = _context.Books.FirstOrDefault(x => x.Genre == genre);
-            return book;
-
-
+            return _context.Books
+                .Where(b => b.Genre.ToLower() == genre.ToLower())
+                .ToList();
         }
     }
 }

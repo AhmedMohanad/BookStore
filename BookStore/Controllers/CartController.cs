@@ -15,20 +15,22 @@ namespace BookStore.Controllers
         private OrdersController _rdersController;
         private CartServices _cs;
         private readonly StoreDbContext _context;
-       private readonly JWTServices _jwtServices;
+        private readonly JWTServices _jwtServices;
+        private readonly UserServices _userServices;
         public CartController(StoreDbContext context,JWTServices jWTServices)
         {
             _rdersController = new OrdersController(context);
             _cs = new CartServices(context);
             _context = context;
             _jwtServices = jWTServices;
+            _userServices = new UserServices(context);
 
 
         }
 
 
-        
 
+        // Get api/cart/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -38,42 +40,78 @@ namespace BookStore.Controllers
             var cart = await _context.Carts.FirstOrDefaultAsync(c => c.Id == id);
                 if (cart == null)
                     return NotFound("no cart found.");
-                var items = cart.Books?.ToList();
+                
 
-                return Ok(items);
+                return Ok(cart);
             
            
         }
 
-        [HttpPost("{cartId}/{itemId}")]
-        public async Task<IActionResult> AddItem(int cartId,int itemId)
+        // Post api/cart/{id}
+        [HttpPost("{itemId}")]
+        public async Task<IActionResult> AddItem(int itemId)
         {
+          
             var userId = _jwtServices.GetUserIdFromToken(HttpContext);
-            if (userId == null) return Unauthorized();
+            if (userId == null) return Unauthorized("Please log in first");
 
-            var cart = await _context.Carts
-                .Include(c => c.Books)
-               .FirstOrDefaultAsync(c => c.Id == cartId);
-                if (cart == null) return BadRequest("this cart not exist");
-                var item = await _context.Books.FirstOrDefaultAsync(i => i.Id == itemId);
-                if (item == null) return BadRequest("this item not exist.");
+           
+            var user = await _context.Users.FindAsync(userId.Value);
+            if (user == null) return NotFound("User not found");
 
-                cart.Books?.Add(itemId);
+           
+            var cart = await _context.Carts.FindAsync(user.CartId);
+            if (cart == null) return BadRequest("Cart not found");
+
+           
+            var bookExists = await _context.Books.AnyAsync(b => b.Id == itemId);
+            if (!bookExists) return BadRequest("Book not found");
+
+          
+            cart.Books ??= new List<int>();
+
+          
+            if (cart.Books.Contains(itemId))
+                return BadRequest("Book already in cart");
+
+          
+            cart.Books.Add(itemId);
+
+          
+            try
+            {
                 await _context.SaveChangesAsync();
-                return Ok(cart);
-       
-
-
+                return Ok(new
+                {
+                    Message = "Book added to cart",
+                    CartId = cart.Id,
+                    BookId = itemId
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Failed to update cart: " + ex.Message);
+            }
         }
 
 
-
-        [HttpDelete("{cartId}/{itemId}")]
-        public async Task<IActionResult> Delete(int cartId, int itemId)
+        // Delete api/cart/{id}
+        [HttpDelete("{itemId}")]
+        public async Task<IActionResult> Delete( int itemId)
         {
             var userId = _jwtServices.GetUserIdFromToken(HttpContext);
             if (userId == null) return Unauthorized();
-            var cart = await _context.Carts.FindAsync(cartId);
+
+
+            var user = await _context.Users.FindAsync(userId.Value);
+            if (user == null) return NotFound("User not found");
+
+
+            var cartCheck = await _context.Carts.FindAsync(user.CartId);
+            if (cartCheck == null) return BadRequest("Cart not found");
+
+
+            var cart = await _context.Carts.FindAsync(cartCheck.Id);
                 if (cart == null)
                 {
                     return NotFound(" cart is empty.");
@@ -91,8 +129,9 @@ namespace BookStore.Controllers
            
         }
 
-
-        [HttpPost("{cartId}/buy")]
+        // Post api/cart/buy/{id}
+        // will empty the cart and create an order :)
+        [HttpPost("buy/{cartId}")]
         public async Task<IActionResult> BuyCart(int cartId)
         {
             var userIdent = _jwtServices.GetUserIdFromToken(HttpContext);
@@ -103,13 +142,13 @@ namespace BookStore.Controllers
                 var books = cart.Books.ToList();
                 double total = _cs.CalculateTotale(books);
 
-                int userId = (int)cart.UserId;
+             
                 DateTime time = DateTime.Now;
                 Order order = new Order()
                 {
                     TotalAmount = total,
                     OrderDate = time,
-                    UserId = userId
+                    UserId = cart.Id
                 };
                 _rdersController.CreateOrder(order);
 
@@ -117,12 +156,25 @@ namespace BookStore.Controllers
 
 
                 return Ok(order);
+
+
+
+
+
+        } 
         
+        
+        
+        // Get api/cart/getcartbyid/{id}
+        [HttpGet("getcartbyid/{id}")]
+        public async Task<IActionResult> GetCartById(int id)
+        {
+            var userIdent = _jwtServices.GetUserIdFromToken(HttpContext);
+            if (userIdent == null) return Unauthorized();
 
-
-
-
-}
+            var cart =await _context.Carts.FirstOrDefaultAsync(c => c.Id == id);
+            return Ok(cart);
+        }
 
 
 

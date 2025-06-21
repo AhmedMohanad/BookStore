@@ -31,7 +31,7 @@ namespace BookStore.Controllers
 
         }
 
-        // GET api/books
+        // GET api/book
         [HttpGet]
         public async Task<IActionResult> GetAllBooks()
         {
@@ -43,7 +43,7 @@ namespace BookStore.Controllers
 
        
 
-        // POST api/books
+        // POST api/book
         [HttpPost]
         public async Task<IActionResult> CreateBook([FromBody] Book book)
         {
@@ -64,7 +64,7 @@ namespace BookStore.Controllers
           
         }
 
-        // PUT api/books/{id}
+        // PUT api/book/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBook(int id, [FromBody] Book book)
         {
@@ -88,7 +88,7 @@ namespace BookStore.Controllers
             }
         
 
-        // DELETE api/books/{id}
+        // DELETE api/book/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBook(int id)
         {
@@ -107,11 +107,11 @@ namespace BookStore.Controllers
                 return NoContent();
            
         }
-
-        [HttpGet("{title}")]
+        // Get  api/book/title/{title}
+        [HttpGet("title/{title}")]
         public async Task<IActionResult> GetBookByTitle(string title)
         {
-            var book = _bookServices.GetBookByTitle(title);
+            var book = _bookServices.GetBooksByTitle(title);
             if (book == null)
                 return NotFound("Book not found");
 
@@ -119,6 +119,30 @@ namespace BookStore.Controllers
             return Ok(book);
         }
 
+        // Get  api/book/author/{author}
+        [HttpGet("author/{author}")]
+        public async Task<IActionResult> GetBooksByAuthor(string author)
+        {
+            var books = _bookServices.GetBooksByAuthor(author);
+            if (books == null || !books.Any())
+                return NotFound("No books found by this author");
+
+            return Ok(books);
+        }
+
+        // Get  api/book/genre/{genre}
+        [HttpGet("genre/{genre}")]
+        public async Task<IActionResult> GetBooksByGenre(string genre)
+        {
+            var books = _bookServices.GetBooksByGenre(genre);
+            if (books == null || !books.Any())
+                return NotFound("No books found in this genre");
+
+            return Ok(books);
+        }
+
+
+        // Get  api/book/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBookById(int id)
         {
@@ -129,6 +153,6 @@ namespace BookStore.Controllers
 
             return Ok(book);
         }
-        //Note: complete another book filters 
+       
     }
 }

@@ -16,7 +16,7 @@ namespace BookStore.Controllers
 {
 
     [ApiController]
-    [Route("api/user")] // Pluralized resource name
+    [Route("api/user")] 
     public class UserController : Controller
     {
        
@@ -32,6 +32,8 @@ namespace BookStore.Controllers
             
         }
 
+
+        // Get api/user
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -43,6 +45,7 @@ namespace BookStore.Controllers
             return Ok(users);
         }
 
+        // Post api/user/signup
         [HttpPost("signup")]
         public async Task<IActionResult> Register([FromBody]RegisterDto dto)
         {
@@ -70,7 +73,7 @@ namespace BookStore.Controllers
 
 
 
-
+        // Post api/user/login
         [HttpPost("login")]
         public IActionResult Login(LoginDto dto)
         {
@@ -91,7 +94,7 @@ namespace BookStore.Controllers
             return Ok("success");
         }
 
-
+        // Post api/user/logout
         [HttpPost("logout")]
         public IActionResult Logout()
         {
@@ -108,6 +111,8 @@ namespace BookStore.Controllers
 
 
 
+
+        // ** this method are used to  "" authenticate "" the requests in any controller **
         public bool User()
         {
 
