@@ -35,5 +35,21 @@ namespace BookStore.JWT
 
         }
 
+        public int? GetUserIdFromToken(HttpContext context)
+        {
+            try
+            {
+                var jwt = context.Request.Cookies["jwt"];
+                if (string.IsNullOrEmpty(jwt)) return null;
+
+                var token = Verify(jwt);
+                return int.Parse(token.Issuer);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
     }
 }

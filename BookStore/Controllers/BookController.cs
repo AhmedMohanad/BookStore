@@ -1,4 +1,5 @@
 ﻿using BookStore.Data;
+using BookStore.JWT;
 using BookStore.Models;
 using BookStore.Validatore;
 using Microsoft.AspNetCore.Authorization;
@@ -11,13 +12,19 @@ namespace BookStore.Controllers
     [Route("api/book")] // Pluralized resource name
     public class BooksController : ControllerBase // Changed to ControllerBase for API
     {
+
+      
         private readonly StoreDbContext _context;
         private readonly BookValidation _validation;
+        private readonly JWTServices _jwtServices;
 
-        public BooksController(StoreDbContext context)
+        public BooksController(StoreDbContext context, JWTServices jWTServices)
         {
+           
             _context = context;
             _validation = new BookValidation(context);
+            _jwtServices = jWTServices;
+           
         }
 
         // GET api/books
@@ -31,7 +38,7 @@ namespace BookStore.Controllers
         }
 
         // GET api/books/{id}
-        [Authorize]
+       
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBookById(int id)
         {
@@ -46,48 +53,65 @@ namespace BookStore.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateBook([FromBody] Book book)
         {
+
+
+            var userId = _jwtServices.GetUserIdFromToken(HttpContext);
+            if (userId == null) return Unauthorized();
+
             if (!ModelState.IsValid || string.IsNullOrEmpty(book.Title))
-                return BadRequest("Invalid book data");
+                    return BadRequest("Invalid book data");
 
-            book.IsAvailable = book.Stock > 0;
+                book.IsAvailable = book.Stock > 0;
 
-            await _context.Books.AddAsync(book);
-            await _context.SaveChangesAsync();
+                await _context.Books.AddAsync(book);
+                await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetBookById), new { id = book.Id }, book);
+                return CreatedAtAction(nameof(GetBookById), new { id = book.Id }, book);
+          
         }
 
         // PUT api/books/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBook(int id, [FromBody] Book book)
         {
+
+            var userId = _jwtServices.GetUserIdFromToken(HttpContext);
+            if (userId == null) return Unauthorized();
+
             if (id != book.Id)
-                return BadRequest("ID mismatch");
+                    return BadRequest("ID mismatch");
 
-            if (!ModelState.IsValid)
-                return BadRequest("Invalid book data");
+                if (!ModelState.IsValid)
+                    return BadRequest("Invalid book data");
 
-            if (!await _validation.isExist(id))
-                return NotFound("Book not found");
+                if (!await _validation.isExist(id))
+                    return NotFound("Book not found");
 
-            _context.Entry(book).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+                _context.Entry(book).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
 
-            return NoContent();
-        }
+                return NoContent();
+            }
+        
 
         // DELETE api/books/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBook(int id)
         {
+
+
+            var userId = _jwtServices.GetUserIdFromToken(HttpContext);
+            if (userId == null) return Unauthorized();
             var book = await _context.Books.FindAsync(id);
-            if (book == null)
-                return NotFound();
+                if (book == null)
+                    return NotFound();
 
-            _context.Books.Remove(book);
-            await _context.SaveChangesAsync();
+                _context.Books.Remove(book);
+                await _context.SaveChangesAsync();
 
-            return NoContent();
+
+                return NoContent();
+           
         }
     }
 }

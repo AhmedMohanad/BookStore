@@ -1,5 +1,6 @@
 ﻿using BookStore.Data;
 using BookStore.Models;
+using Humanizer.Localisation;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStore.Services
@@ -20,6 +21,29 @@ namespace BookStore.Services
             return book;
 
             
+        }
+
+        public Book GetBookByTitle(string title)
+        {
+            var book = _context.Books.FirstOrDefault(x => x.Title == title);
+            return book;
+
+
+        }
+
+        public Book GetBookByAuthor(string author)
+        {
+            var book = _context.Books.FirstOrDefault(x => x.Author == author);
+            return book;
+
+
+        }
+        public Book GetBookByGenre(string genre)
+        {
+            var book = _context.Books.FirstOrDefault(x => x.Genre == genre);
+            return book;
+
+
         }
     }
 }

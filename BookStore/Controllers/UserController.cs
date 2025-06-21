@@ -21,14 +21,12 @@ namespace BookStore.Controllers
     {
        
         private readonly StoreDbContext _context;
-        private readonly IConfiguration _config;
         private CartServices _cs;
         private readonly JWTServices _jWTService;
 
-        public UserController(StoreDbContext context, IConfiguration config,JWTServices jWT)
+        public UserController(StoreDbContext context,JWTServices jWT)
         {
             _context = context;
-            _config = config;
             _jWTService = jWT;
           
             
@@ -80,31 +78,36 @@ namespace BookStore.Controllers
             if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.Password))
                 return Unauthorized("Invalid credentials.");
 
-            // generate token 
-
             var jwt = _jWTService.Generate(user.Id);
 
-            Response.Cookies.Append("jwt", jwt);
+            Response.Cookies.Append("jwt", jwt, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Expires = DateTime.Now.AddDays(7)
+            });
 
-            return Ok(
-               "success"
-                );
-            
+            return Ok("success");
         }
 
-     
+
         [HttpPost("logout")]
         public IActionResult Logout()
         {
-            Response.Cookies.Delete("jwt");
+            Response.Cookies.Delete("jwt", new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None
+            });
             return Ok("Bye By");
         }
 
-       
 
-        
-       
-       
+
+
+
         public bool User()
         {
 
