@@ -1,6 +1,7 @@
 ﻿using BookStore.Data;
 using BookStore.JWT;
 using BookStore.Models;
+using BookStore.Services;
 using BookStore.Validatore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +18,7 @@ namespace BookStore.Controllers
         private readonly StoreDbContext _context;
         private readonly BookValidation _validation;
         private readonly JWTServices _jwtServices;
+        private BookServices _bookServices;
 
         public BooksController(StoreDbContext context, JWTServices jWTServices)
         {
@@ -24,7 +26,9 @@ namespace BookStore.Controllers
             _context = context;
             _validation = new BookValidation(context);
             _jwtServices = jWTServices;
-           
+            _bookServices = new BookServices(context);
+
+
         }
 
         // GET api/books
@@ -37,17 +41,7 @@ namespace BookStore.Controllers
             return Ok(books);
         }
 
-        // GET api/books/{id}
        
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetBookById(int id)
-        {
-            if (!await _validation.isExist(id))
-                return NotFound("Book not found");
-
-            var book = await _context.Books.FindAsync(id);
-            return Ok(book);
-        }
 
         // POST api/books
         [HttpPost]
@@ -113,5 +107,28 @@ namespace BookStore.Controllers
                 return NoContent();
            
         }
+
+        [HttpGet("{title}")]
+        public async Task<IActionResult> GetBookByTitle(string title)
+        {
+            var book = _bookServices.GetBookByTitle(title);
+            if (book == null)
+                return NotFound("Book not found");
+
+           
+            return Ok(book);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetBookById(int id)
+        {
+            var book = _bookServices.GetBookById(id);
+            if (book == null)
+                return NotFound("Book not found");
+
+
+            return Ok(book);
+        }
+        //Note: complete another book filters 
     }
 }
