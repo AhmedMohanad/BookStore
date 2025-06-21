@@ -1,4 +1,5 @@
 using BookStore.Data;
+using BookStore.JWT;
 using BookStore.MiddleWare;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -7,28 +8,16 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<StoreDbContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString"))
     );
+builder.Services.AddScoped<JWTServices>();
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = "BookStoreAPI",
-            ValidAudience = "BookStoreUsers",
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes("super_secret_key_123")
-            )
-        };
-    });
+
+
 
 
 
@@ -48,9 +37,16 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseCors(options => options
+                        .AllowAnyHeader()
+                        .AllowCredentials()
+                        .AllowAnyMethod());
+
+
 app.UseAuthorization();
 
 app.MapStaticAssets();
+
 
 app.MapControllerRoute(
     name: "default",

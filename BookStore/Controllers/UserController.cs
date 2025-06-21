@@ -1,10 +1,16 @@
 ﻿using BookStore.Data;
 using BookStore.DTOs;
+using BookStore.JWT;
 using BookStore.Models;
 using BookStore.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace BookStore.Controllers
 {
@@ -17,16 +23,17 @@ namespace BookStore.Controllers
         private readonly StoreDbContext _context;
         private readonly IConfiguration _config;
         private CartServices _cs;
+        private readonly JWTServices _jWTService;
 
-        public UserController(StoreDbContext context, IConfiguration config)
+        public UserController(StoreDbContext context, IConfiguration config,JWTServices jWT)
         {
             _context = context;
             _config = config;
+            _jWTService = jWT;
           
             
         }
 
-        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -65,5 +72,55 @@ namespace BookStore.Controllers
 
 
 
+
+        [HttpPost("login")]
+        public IActionResult Login(LoginDto dto)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.Email == dto.Email);
+            if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.Password))
+                return Unauthorized("Invalid credentials.");
+
+            // generate token 
+
+            var jwt = _jWTService.Generate(user.Id);
+
+            Response.Cookies.Append("jwt", jwt);
+
+            return Ok(
+               "success"
+                );
+            
+        }
+
+     
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("jwt");
+            return Ok("Bye By");
+        }
+
+       
+
+        
+       
+       
+        public bool User()
+        {
+
+            try
+            {
+                var jwt = Request.Cookies["jwt"];
+                var token = _jWTService.Verify(jwt);
+                int userId = int.Parse(token.Issuer);
+                var user = _context.Users.FirstOrDefault(i => i.Id == userId);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
     }
 }
+
