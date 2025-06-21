@@ -3,6 +3,7 @@ using BookStore.DTOs;
 using BookStore.JWT;
 using BookStore.Models;
 using BookStore.Services;
+using BookStore.Validatore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Mvc;
@@ -23,13 +24,14 @@ namespace BookStore.Controllers
         private readonly StoreDbContext _context;
         private CartServices _cs;
         private readonly JWTServices _jWTService;
+       
 
         public UserController(StoreDbContext context,JWTServices jWT)
         {
             _context = context;
             _jWTService = jWT;
-          
-            
+        
+
         }
 
 
@@ -45,10 +47,13 @@ namespace BookStore.Controllers
             return Ok(users);
         }
 
-        // Post api/user/signup
-        [HttpPost("signup")]
+        // Post api/user/register
+        //this method will sinup and login in by calling login action :)
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody]RegisterDto dto)
         {
+            if (!EmailValidation.ValidateEmail(dto.Email))
+                return BadRequest("invalid email format");
             _cs = new CartServices(_context);
 
             if (_context.Users.Any(u => u.Email == dto.Email))
@@ -67,6 +72,8 @@ namespace BookStore.Controllers
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
+
+            this.Login(new LoginDto { Email = dto.Email,Password = dto.Password});
 
             return Ok($"Welcome in our site {user.Name} ");
         }
