@@ -178,5 +178,41 @@ namespace BookStore.Controllers
 
 
 
+
+        
+        // Put api/cart/edit/{id}
+        [HttpPut("edit/{id}")]
+        public async Task<IActionResult> EditCart(int id,Cart newCart)
+        {
+            var userIdent = _jwtServices.GetUserIdFromToken(HttpContext);
+            if (userIdent == null) return Unauthorized();
+
+            if(id != newCart.Id)
+            {
+                return BadRequest();
+            }
+            _context.Entry(newCart).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                if (await _context.Carts.FindAsync(id) == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+
+            }
+            return NoContent();
+        }
+
+
+
     }
 }

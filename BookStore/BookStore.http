@@ -1,0 +1,6 @@
+﻿@BookStore_HostAddress = https://localhost:7082
+
+@title=string
+GET {{BookStore_HostAddress}}/api/book/title/{{title}}
+
+###
