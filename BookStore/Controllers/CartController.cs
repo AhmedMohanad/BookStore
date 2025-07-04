@@ -49,6 +49,7 @@ namespace BookStore.Controllers
 
         // Post api/cart/{id}
         [HttpPost("{itemId}")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddItem(int itemId)
         {
           
@@ -97,6 +98,7 @@ namespace BookStore.Controllers
 
         // Delete api/cart/{id}
         [HttpDelete("{itemId}")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete( int itemId)
         {
             var userId = _jwtServices.GetUserIdFromToken(HttpContext);
@@ -132,6 +134,7 @@ namespace BookStore.Controllers
         // Post api/cart/buy/{id}
         // will empty the cart and create an order :)
         [HttpPost("buy/{cartId}")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> BuyCart(int cartId)
         {
             var userIdent = _jwtServices.GetUserIdFromToken(HttpContext);
@@ -182,6 +185,7 @@ namespace BookStore.Controllers
         
         // Put api/cart/edit/{id}
         [HttpPut("edit/{id}")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditCart(int id,Cart newCart)
         {
             var userIdent = _jwtServices.GetUserIdFromToken(HttpContext);

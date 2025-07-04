@@ -45,6 +45,7 @@ namespace BookStore.Controllers
 
         // POST api/book
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateBook([FromBody] Book book)
         {
 
@@ -66,7 +67,8 @@ namespace BookStore.Controllers
 
         // PUT api/book/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateBook(int id, [FromBody] Book book)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateBook(int id, [Bind (include: "Title,Description,Author,Genre,Price,Stock")] Book book)
         {
 
             var userId = _jwtServices.GetUserIdFromToken(HttpContext);
@@ -90,6 +92,7 @@ namespace BookStore.Controllers
 
         // DELETE api/book/{id}
         [HttpDelete("{id}")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteBook(int id)
         {
 

@@ -54,6 +54,7 @@ namespace BookStore.Controllers
 
         // POST api/order
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateOrder([FromBody] Order order)
         {
             var userId = _jwtServices.GetUserIdFromToken(HttpContext);
@@ -69,6 +70,7 @@ namespace BookStore.Controllers
 
         // PUT api/order/{id}
         [HttpPut("{id}")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateOrder(int id, [FromBody] Order order)
         {
             var userId = _jwtServices.GetUserIdFromToken(HttpContext);
@@ -88,6 +90,7 @@ namespace BookStore.Controllers
 
         // DELETE api/order/{id}
         [HttpDelete("{id}")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteOrder(int id)
         {
 

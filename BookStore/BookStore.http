@@ -4,3 +4,7 @@
 GET {{BookStore_HostAddress}}/api/book/title/{{title}}
 
 ###
+
+GET {{BookStore_HostAddress}}/api/book
+
+###

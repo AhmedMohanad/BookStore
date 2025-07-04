@@ -50,6 +50,7 @@ namespace BookStore.Controllers
         // Post api/user/register
         //this method will sinup and login in by calling login action :)
         [HttpPost("register")]
+       
         public async Task<IActionResult> Register([FromBody]RegisterDto dto)
         {
             if (!EmailValidation.ValidateEmail(dto.Email))
